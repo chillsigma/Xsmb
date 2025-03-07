@@ -28,4 +28,32 @@ document.addEventListener('DOMContentLoaded', () => {
             if (button.textContent.trim() === 'G.6') {
                 let clickCount = buttonClickCounts.get(button);
                 if (clickCount >= 3) {
-                
+                    console.log("Đã random đủ 3 lần cho G.6.");
+                    return;
+                }
+                maxRandomCount = 3; // Chỉ chạy tối đa 3 lần
+                buttonClickCounts.set(button, clickCount + 1); // Cập nhật số lần bấm
+            }
+
+            let availableNumbers = A.filter(number => !usedNumbers.has(number));
+
+            for (let i = 0; i < cells.length && maxRandomCount > 0; i++) {
+                const cell = cells[i];
+                if (cell.textContent.trim() === '-----' && availableNumbers.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * availableNumbers.length);
+                    const randomNumber = availableNumbers[randomIndex];
+
+                    setTimeout(() => {
+                        cell.textContent = randomNumber;
+                        usedNumbers.add(randomNumber);
+                    }, delay);
+
+                    delay += 1250;
+                    availableNumbers.splice(randomIndex, 1); // Xóa số đã dùng khỏi danh sách
+                    maxRandomCount--; // Giảm số ô cần điền
+                }
+            }
+        });
+    });
+});
+                          
