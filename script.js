@@ -1,8 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     const buttons = document.querySelectorAll('.btn');
+    if (buttons.length === 0) {
+        console.error("Không tìm thấy bất kỳ button nào có class '.btn'");
+        return;
+    }
+
     const A = [45833, 24864, 29875, 19846, 58797, 98728, 65829, 18310, 
-           95711, 49212, 2813, 82214, 48315, 19316, 92717, 39218, 
-           10219, 38111, 14272];
+               95711, 49212, 2813, 82214, 48315, 19316, 92717, 39218, 
+               10219, 38111, 14272];
+    
     const usedNumbers = new Set();
     const buttonClickCounts = new Map(); // Lưu số lần bấm của từng nút
 
@@ -20,7 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         button.addEventListener('click', () => {
             const parentRow = button.closest('tr');
-            const cells = parentRow.querySelectorAll('td:not(.have)'); // Lấy các ô cần điền số
+            if (!parentRow) {
+                console.error("Không tìm thấy dòng chứa button.");
+                return;
+            }
+
+            const cells = parentRow.querySelectorAll('td:not(.have)'); // Chỉ chọn ô không có class 'have'
             let delay = 0;
             let maxRandomCount = cells.length; // Số ô cần điền
 
@@ -31,15 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log("Đã random đủ 3 lần cho G.6.");
                     return;
                 }
-                maxRandomCount = 3; // Chỉ chạy tối đa 3 lần
+                maxRandomCount = Math.min(3, cells.length); // Giới hạn 3 ô
                 buttonClickCounts.set(button, clickCount + 1); // Cập nhật số lần bấm
             }
 
             let availableNumbers = A.filter(number => !usedNumbers.has(number));
 
-            for (let i = 0; i < cells.length && maxRandomCount > 0; i++) {
+            for (let i = 0; i < maxRandomCount && availableNumbers.length > 0; i++) {
                 const cell = cells[i];
-                if (cell.textContent.trim() === '-----' && availableNumbers.length > 0) {
+                if (cell.textContent.trim() === '-----') {
                     const randomIndex = Math.floor(Math.random() * availableNumbers.length);
                     const randomNumber = availableNumbers[randomIndex];
 
@@ -50,10 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     delay += 1250;
                     availableNumbers.splice(randomIndex, 1); // Xóa số đã dùng khỏi danh sách
-                    maxRandomCount--; // Giảm số ô cần điền
                 }
             }
         });
     });
 });
-                          
